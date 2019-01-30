@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final EditText editText = findViewById(R.id.et_Input);
+        editText.requestFocus();
         final TextView tv_Res = findViewById(R.id.tv_Result);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -70,17 +72,18 @@ public class MainActivity extends AppCompatActivity {
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    editText.setText(String.format("%s%s", String.valueOf(editText.getText()), btn.getText().toString()));
-                    editText.setSelection(editText.getText().length());
+                    String curBtnText = btn.getText().toString();
+                    addAtCursorPos(curBtnText);
                 }
             });
+            btn.setBackgroundResource(R.drawable.btn_round);
         }
 
         Button btn_Clear = findViewById(R.id.btn_Clear);
         btn_Clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editText.setText("");
+                editText.getText().clear();
                 tv_Res.setText("");
             }
         });
@@ -91,8 +94,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int length = editText.getText().length();
                 if (length > 0) {
-                    editText.getText().delete(length - 1, length);
-                    editText.setSelection(editText.getText().length());
+                    delAtCursorPos();
                 }
             }
         });
@@ -103,13 +105,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int length = editText.getText().length();
                 if (length>0){
+                    int index = editText.getSelectionStart();
                     String lastChar = editText.getText().toString();
-                    lastChar = lastChar.substring(length-1, length);
+                    lastChar=String.valueOf(lastChar.charAt(index-1));
+                    //lastChar = lastChar.substring(length-1, length);
+                    Log.d(TAG, "lastChar: "+lastChar);
                     if (!(lastChar.equals(".")))
                             //&& !(editText.getText().toString().contains(".")))
                     {
-                        editText.setText(String.format("%s%s", String.valueOf(editText.getText()), "."));
-                        editText.setSelection(editText.getText().length());
+                        addAtCursorPos(".");
                     }
                 }
             }
@@ -136,26 +140,26 @@ public class MainActivity extends AppCompatActivity {
                             if (lastChar.equals("/") && curBtn.equals("*")) {
                                 editText.getText().delete(lengthET - 1, lengthET);
                                 editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                editText.setSelection(editText.getText().length());
+                                //editText.setSelection(editText.getText().length());
                             }
                             else if (lastChar.equals("*") && curBtn.equals("/")) {
                                 editText.getText().delete(lengthET - 1, lengthET);
                                 editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                editText.setSelection(editText.getText().length());
+                                //editText.setSelection(editText.getText().length());
                             }
                             else if (lastChar.equals("+") && curBtn.equals("-")) {
                                 editText.getText().delete(lengthET - 1, lengthET);
                                 editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                editText.setSelection(editText.getText().length());
+                                //editText.setSelection(editText.getText().length());
                             }
                             else if (lastChar.equals("-") && curBtn.equals("+")) {
                                 editText.getText().delete(lengthET - 1, lengthET);
                                 editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                editText.setSelection(editText.getText().length());
+                                //editText.setSelection(editText.getText().length());
                             }
                             else {
                                 editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                editText.setSelection(editText.getText().length());
+                                //editText.setSelection(editText.getText().length());
                             }
                         }
                     }
@@ -190,5 +194,38 @@ public class MainActivity extends AppCompatActivity {
             //return numsList;
         }
         //return null;
+    }
+
+    private void delAtCursorPos(){
+        final EditText editText = findViewById(R.id.et_Input);
+        //final TextView tv_Res = findViewById(R.id.tv_Result);
+
+        int index = editText.getSelectionStart();
+        editText.getText().delete(index - 1, index);
+    }
+
+    private void addAtCursorPos(String curBtnText){
+        final EditText editText = findViewById(R.id.et_Input);
+
+        int lengthET = editText.getText().length();
+        int index = editText.getSelectionStart();
+        Log.d(TAG, "index: "+index);
+
+        String full = editText.getText().toString();
+
+        String first = full.substring(0,index);
+        Log.d(TAG, "first: "+first);
+
+        String second = full.substring(index,lengthET);
+        Log.d(TAG, "second: "+second);
+
+        editText.setText(String.format("%s%s%s", first, curBtnText, second));
+
+        Log.d(TAG, "lengthET: "+lengthET);
+
+        if (lengthET>0)
+            editText.setSelection(index + 1);
+        else
+            editText.setSelection(1);
     }
 }
