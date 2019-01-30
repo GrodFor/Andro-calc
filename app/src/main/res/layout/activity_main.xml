@@ -13,7 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="2"
-        android:orientation="vertical">
+        android:divider="@drawable/separatorh"
+        android:orientation="vertical"
+        android:showDividers="end">
 
         <EditText
             android:id="@+id/et_Input"
@@ -24,8 +26,7 @@
             android:ems="10"
             android:focusable="true"
             android:inputType="number"
-            android:textAlignment="textEnd"
-             />
+            android:textAlignment="textEnd" />
 
         <TextView
             android:id="@+id/tv_Result"
@@ -52,7 +53,7 @@
             android:layout_weight="1"
             android:divider="@drawable/separatorh"
             android:orientation="vertical"
-            android:showDividers="middle|beginning">
+            android:showDividers="middle">
 
             <LinearLayout
                 android:id="@+id/ll_clear"
@@ -60,8 +61,10 @@
                 android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:divider="@drawable/separatorv"
+                android:dividerPadding="2dp"
                 android:orientation="horizontal"
-                android:padding="2dp">
+                android:padding="2dp"
+                android:showDividers="middle">
 
                 <Button
                     android:id="@+id/btn_Clear"
@@ -231,8 +234,9 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:divider="@drawable/separatorh"
+            android:dividerPadding="4dp"
             android:orientation="vertical"
-            android:showDividers="beginning">
+            android:showDividers="middle">
 
             <Button
                 android:id="@+id/button4"

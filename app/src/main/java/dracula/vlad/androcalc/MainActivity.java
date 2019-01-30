@@ -132,35 +132,54 @@ public class MainActivity extends AppCompatActivity {
                     int lengthET = editText.getText().length();
                     String curBtn=btn.getText().toString();
 
+
                     if (!btn.getText().toString().equals("=") && lengthET!=0) {
+//                        String lastChar = editText.getText().toString();
+//                        lastChar = lastChar.substring(lengthET-1, lengthET);
+
                         String lastChar = editText.getText().toString();
-                        lastChar = lastChar.substring(lengthET-1, lengthET);
+                        int index = editText.getSelectionStart();
+                        if(index!=0){
+                            Log.d(TAG, "onClick index: "+index);
+                            lastChar=String.valueOf(lastChar.charAt(index-1));
+                        }
+                        else lastChar=" ";
+
 
                         if (!(lastChar.equals(curBtn))){
                             if (lastChar.equals("/") && curBtn.equals("*")) {
-                                editText.getText().delete(lengthET - 1, lengthET);
-                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
+//                                editText.getText().delete(lengthET - 1, lengthET);
+//                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
                                 //editText.setSelection(editText.getText().length());
+                                delAtCursorPos();
+                                addAtCursorPos(curBtn);
                             }
                             else if (lastChar.equals("*") && curBtn.equals("/")) {
-                                editText.getText().delete(lengthET - 1, lengthET);
-                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
+//                                editText.getText().delete(lengthET - 1, lengthET);
+//                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
                                 //editText.setSelection(editText.getText().length());
+                                delAtCursorPos();
+                                addAtCursorPos(curBtn);
                             }
                             else if (lastChar.equals("+") && curBtn.equals("-")) {
-                                editText.getText().delete(lengthET - 1, lengthET);
-                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
+//                                editText.getText().delete(lengthET - 1, lengthET);
+//                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
                                 //editText.setSelection(editText.getText().length());
+                                delAtCursorPos();
+                                addAtCursorPos(curBtn);
                             }
                             else if (lastChar.equals("-") && curBtn.equals("+")) {
-                                editText.getText().delete(lengthET - 1, lengthET);
-                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
+//                                editText.getText().delete(lengthET - 1, lengthET);
+//                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
                                 //editText.setSelection(editText.getText().length());
+                                delAtCursorPos();
+                                addAtCursorPos(curBtn);
                             }
-                            else {
-                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                //editText.setSelection(editText.getText().length());
-                            }
+//                            else {
+//                                //editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
+//                                //editText.setSelection(editText.getText().length());
+//                                addAtCursorPos(curBtn);
+//                            }
                         }
                     }
                     else{
