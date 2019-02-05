@@ -2,42 +2,78 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ll_root"
+    android:id="@+id/ll_Root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:divider="@drawable/separatorh"
     android:orientation="vertical"
+    android:showDividers="middle"
+    tools:ignore="NestedWeights"
     tools:context=".MainActivity">
 
     <LinearLayout
-        android:id="@+id/ll_Result"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="2"
-        android:divider="@drawable/separatorh"
+        android:layout_weight="1.7"
         android:orientation="vertical"
-        android:showDividers="end">
+        tools:ignore="RtlCompat">
 
-        <EditText
-            android:id="@+id/et_Input"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:cursorVisible="true"
-            android:ems="10"
-            android:focusable="true"
-            android:inputType="number"
-            android:textAlignment="textEnd" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_Result"
+            <EditText
+                android:id="@+id/et_Input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:cursorVisible="true"
+                android:ems="10"
+                android:focusable="true"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center"
+                android:textAlignment="textEnd"
+                android:textSize="40sp"
+                android:digits="0123456789\n"
+                android:inputType="number|textMultiLine"
+                android:scrollbars="vertical"
+                android:scrollHorizontally="false"
+                android:singleLine="false"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_Result"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:textAlignment="textEnd" />
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:divider="@drawable/separatorh"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
 
+            <TextView
+                android:id="@+id/tv_Result"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:ellipsize="middle"
+                android:gravity="center"
+                android:singleLine="true"
+                android:textAlignment="textEnd"
+                android:textColor="@color/result_color"
+                android:textSize="32sp"
+                app:autoSizeMaxTextSize="32dp"
+                app:autoSizeMinTextSize="24sp" />
+
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/ll_Buttons"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -60,38 +96,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
+                android:background="@color/funcs_back"
                 android:divider="@drawable/separatorv"
-                android:dividerPadding="2dp"
                 android:orientation="horizontal"
-                android:padding="2dp"
                 android:showDividers="middle">
 
                 <Button
                     android:id="@+id/btn_Clear"
+                    style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@drawable/btn_round"
-                    android:text="Clear" />
+                    android:cropToPadding="false"
+                    android:fontFamily="sans-serif-light"
+                    android:text="C"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="24sp"
+                    android:typeface="sans" />
 
                 <Button
                     android:id="@+id/btn_Del"
+                    style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@drawable/btn_round"
-                    android:text="Delete" />
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="true"
+                    android:fontFamily="sans-serif-light"
+                    android:scaleType="centerInside"
+                    android:text="DEL"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
+                    android:textColor="@android:color/black"
+                    android:textSize="24sp"
+                    android:typeface="sans" />
 
                 <Button
                     android:id="@+id/btn_Dot"
+                    style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@drawable/btn_round"
-                    android:text="." />
+                    android:text="."
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="32sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -99,8 +149,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@color/gray_back"
                 android:divider="@drawable/separatorh"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:showDividers="middle">
 
                 <LinearLayout
                     android:id="@+id/ll_thirdRow"
@@ -109,31 +161,37 @@
                     android:layout_weight="1"
                     android:divider="@drawable/separatorv"
                     android:orientation="horizontal"
-                    android:padding="2dp">
+                    android:showDividers="middle">
 
                     <Button
                         android:id="@+id/button5"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="7" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="7"
+                        android:textSize="36sp" />
 
                     <Button
                         android:id="@+id/button6"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="8" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="8"
+                        android:textSize="36sp" />
 
                     <Button
                         android:id="@+id/button7"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="9" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="9"
+                        android:textSize="36sp" />
 
                 </LinearLayout>
 
@@ -144,31 +202,37 @@
                     android:layout_weight="1"
                     android:divider="@drawable/separatorv"
                     android:orientation="horizontal"
-                    android:padding="2dp">
+                    android:showDividers="middle">
 
                     <Button
                         android:id="@+id/button9"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="4" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="4"
+                        android:textSize="36sp" />
 
                     <Button
                         android:id="@+id/button10"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="5" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="5"
+                        android:textSize="36sp" />
 
                     <Button
                         android:id="@+id/button11"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="6" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="6"
+                        android:textSize="36sp" />
 
                 </LinearLayout>
 
@@ -179,31 +243,37 @@
                     android:layout_weight="1"
                     android:divider="@drawable/separatorv"
                     android:orientation="horizontal"
-                    android:padding="2dp">
+                    android:showDividers="middle">
 
                     <Button
                         android:id="@+id/button13"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="1" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="1"
+                        android:textSize="36sp" />
 
                     <Button
                         android:id="@+id/button14"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="2" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="2"
+                        android:textSize="36sp" />
 
                     <Button
                         android:id="@+id/button15"
+                        style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
                         android:layout_weight="1"
-                        android:text="3" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="3"
+                        android:textSize="36sp" />
 
                 </LinearLayout>
 
@@ -215,14 +285,16 @@
                     android:divider="@drawable/separatorv"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:padding="2dp">
+                    android:showDividers="middle">
 
                     <Button
                         android:id="@+id/button17"
-                        android:layout_width="wrap_content"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_margin="5dp"
-                        android:text="0" />
+                        android:fontFamily="sans-serif-light"
+                        android:text="0"
+                        android:textSize="36sp" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -233,55 +305,65 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="3"
+            android:background="@color/funcs_back"
             android:divider="@drawable/separatorh"
-            android:dividerPadding="4dp"
             android:orientation="vertical"
             android:showDividers="middle">
 
             <Button
                 android:id="@+id/button4"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="7dp"
                 android:layout_weight="1"
-                android:background="@drawable/btn_round"
-                android:text="/" />
+                android:fontFamily="sans-serif-light"
+                android:text="/"
+                android:textColor="@android:color/black"
+                android:textSize="36sp" />
 
             <Button
                 android:id="@+id/button3"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="7dp"
                 android:layout_weight="1"
-                android:background="@drawable/btn_round"
-                android:text="*" />
+                android:fontFamily="sans-serif-light"
+                android:text="*"
+                android:textColor="@android:color/black"
+                android:textSize="36sp" />
 
             <Button
                 android:id="@+id/button2"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="7dp"
                 android:layout_weight="1"
-                android:background="@drawable/btn_round"
-                android:text="+" />
+                android:fontFamily="sans-serif-light"
+                android:text="+"
+                android:textColor="@android:color/black"
+                android:textSize="36sp" />
 
             <Button
                 android:id="@+id/button"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="7dp"
                 android:layout_weight="1"
-                android:background="@drawable/btn_round"
-                android:text="-" />
+                android:fontFamily="sans-serif-light"
+                android:text="-"
+                android:textColor="@android:color/black"
+                android:textSize="36sp" />
 
             <Button
                 android:id="@+id/button8"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="7dp"
                 android:layout_weight="1"
-                android:background="@drawable/btn_round"
-                android:text="=" />
+                android:fontFamily="sans-serif-light"
+                android:text="="
+                android:textColor="@android:color/black"
+                android:textSize="36sp" />
         </LinearLayout>
     </LinearLayout>
 

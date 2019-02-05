@@ -2,39 +2,32 @@ package dracula.vlad.androcalc;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.io.BufferedReader;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.NoSuchElementException;
+
+import static dracula.vlad.androcalc.ShuntingYard.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String TAG = "LOG_AC";
-    private ArrayList<String> numsList= new ArrayList<>();
+    private String TAG = "LOG_Main";
+    private String input = "";
     private ArrayList<Button> buttonArrayList= new ArrayList<>();
+    private double result;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -42,8 +35,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getChildViews((ViewGroup) findViewById(R.id.ll_Buttons));
+
         final EditText editText = findViewById(R.id.et_Input);
         editText.requestFocus();
+
         final TextView tv_Res = findViewById(R.id.tv_Result);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -63,10 +59,60 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        editText.addTextChangedListener(new TextWatcher() {
+
+            // the user's changes are saved here
+            public void onTextChanged(CharSequence c, int start, int before, int count) {
+                input=c.toString();
+                Log.d(TAG, "1 onTextChanged input: "+input);
+
+                input=input.replaceAll("([+\\-/*])(\\d)"," $1 $2");
+                Log.d(TAG, "2 onTextChanged input: "+input);
+
+                input=input.trim().replaceAll("(^-)(\\s)","$1");
+                Log.d(TAG, "3 onTextChanged input: "+input);
+
+                //input=input.replaceAll("\\s+", " ");
+                //Log.d(TAG, "4 onTextChanged input: "+input);
+
+                input=input.replaceAll("(\\D\\s\\D)(\\s)", "$1");
+                Log.d(TAG, "5 onTextChanged input: "+input);
+
+                input=input.replaceAll("(\\d)([-+/*])", "$1 $2");
+                Log.d(TAG, "6 onTextChanged input: "+input);
+
+                //input=input.replaceAll("\\s+", " ");
+                //Log.d(TAG, "7 onTextChanged input: "+input);
+
+                //input=input.replaceAll("(\\s)(\\.)", "$2");
+                //Log.d(TAG, "8 onTextChanged input: "+input);
+
+                try {
+                    result = evalRPN(infixToPostfix(input));
+                    Log.d(TAG, "result: "+result);
+
+                    if (!String.valueOf(result).equals("-0.0")) {
+                        int intResult = (int)result;
+                        if (intResult==result)
+                            tv_Res.setText(String.valueOf(intResult));
+                        else {
+                            tv_Res.setText(String.valueOf(result));
+                        }
+                    }
+                }
+                catch (NoSuchElementException ignored){}
+            }
+
+            public void beforeTextChanged(CharSequence c, int start, int count, int after) {
+                // this space intentionally left blank
+            }
+
+            public void afterTextChanged(Editable c) {
+                // this one too
+            }
+        });
+
         getChildViews((ViewGroup) findViewById(R.id.ll_nums));
-        Collections.sort(numsList);
-        String nums = Arrays.deepToString(numsList.toArray());
-        Log.d(TAG, nums);
 
         for (final Button btn: buttonArrayList){
             btn.setOnClickListener(new View.OnClickListener() {
@@ -76,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
                     addAtCursorPos(curBtnText);
                 }
             });
-            btn.setBackgroundResource(R.drawable.btn_round);
         }
 
         Button btn_Clear = findViewById(R.id.btn_Clear);
@@ -106,14 +151,12 @@ public class MainActivity extends AppCompatActivity {
                 int length = editText.getText().length();
                 if (length>0){
                     int index = editText.getSelectionStart();
-                    String lastChar = editText.getText().toString();
-                    lastChar=String.valueOf(lastChar.charAt(index-1));
-                    //lastChar = lastChar.substring(length-1, length);
-                    Log.d(TAG, "lastChar: "+lastChar);
-                    if (!(lastChar.equals(".")))
-                            //&& !(editText.getText().toString().contains(".")))
-                    {
-                        addAtCursorPos(".");
+                    if (index!=0){
+                        String lastChar = editText.getText().toString();
+                        lastChar=String.valueOf(lastChar.charAt(index-1));
+                        Log.d(TAG, "lastChar: "+lastChar);
+                        if (!(lastChar.equals(".")))
+                            addAtCursorPos(".");
                     }
                 }
             }
@@ -128,65 +171,48 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    int length = tv_Res.getText().length();
                     int lengthET = editText.getText().length();
                     String curBtn=btn.getText().toString();
 
 
                     if (!btn.getText().toString().equals("=") && lengthET!=0) {
-//                        String lastChar = editText.getText().toString();
-//                        lastChar = lastChar.substring(lengthET-1, lengthET);
 
                         String lastChar = editText.getText().toString();
                         int index = editText.getSelectionStart();
-                        if(index!=0){
-                            Log.d(TAG, "onClick index: "+index);
+                        if(index!=0)
                             lastChar=String.valueOf(lastChar.charAt(index-1));
-                        }
                         else lastChar=" ";
 
-
+                        //Log.d(TAG, "lastChar: "+lastChar);
                         if (!(lastChar.equals(curBtn))){
                             if (lastChar.equals("/") && curBtn.equals("*")) {
-//                                editText.getText().delete(lengthET - 1, lengthET);
-//                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                //editText.setSelection(editText.getText().length());
                                 delAtCursorPos();
                                 addAtCursorPos(curBtn);
                             }
                             else if (lastChar.equals("*") && curBtn.equals("/")) {
-//                                editText.getText().delete(lengthET - 1, lengthET);
-//                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                //editText.setSelection(editText.getText().length());
                                 delAtCursorPos();
                                 addAtCursorPos(curBtn);
                             }
                             else if (lastChar.equals("+") && curBtn.equals("-")) {
-//                                editText.getText().delete(lengthET - 1, lengthET);
-//                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                //editText.setSelection(editText.getText().length());
                                 delAtCursorPos();
                                 addAtCursorPos(curBtn);
                             }
                             else if (lastChar.equals("-") && curBtn.equals("+")) {
-//                                editText.getText().delete(lengthET - 1, lengthET);
-//                                editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-                                //editText.setSelection(editText.getText().length());
                                 delAtCursorPos();
                                 addAtCursorPos(curBtn);
                             }
-//                            else {
-//                                //editText.setText(String.format("%s%s", String.valueOf(editText.getText()), curBtn));
-//                                //editText.setSelection(editText.getText().length());
-//                                addAtCursorPos(curBtn);
-//                            }
+                            else {
+                                addAtCursorPos(curBtn);
+                            }
                         }
                     }
-                    else{
-                        if (length>0){
-                            editText.setText(tv_Res.getText());
-                            tv_Res.setText("");
-                        }
+                    else if (btn.getText().toString().equals("-")){
+                        addAtCursorPos(curBtn);
+                    }
+                    else if (btn.getText().toString().equals("=")) {
+                        editText.setText(tv_Res.getText());
+                        input="";
+                        editText.setSelection(editText.getText().length());
                     }
                 }
             });
@@ -204,23 +230,21 @@ public class MainActivity extends AppCompatActivity {
                     getChildViews((ViewGroup) view);
                 }
                 if (view instanceof Button) {
-                    ((Button) view).setTextColor(Color.BLUE);
-                    String s = ((Button) view).getText().toString();
-                    numsList.add(s);
+                    TypedValue outValue = new TypedValue();
+                    view.getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,
+                            outValue, true);
+                    view.setBackgroundResource(outValue.resourceId);
                     buttonArrayList.add((Button) view);
                 }
             }
-            //return numsList;
         }
-        //return null;
     }
 
     private void delAtCursorPos(){
         final EditText editText = findViewById(R.id.et_Input);
-        //final TextView tv_Res = findViewById(R.id.tv_Result);
-
         int index = editText.getSelectionStart();
-        editText.getText().delete(index - 1, index);
+        if(index!=0)
+            editText.getText().delete(index - 1, index);
     }
 
     private void addAtCursorPos(String curBtnText){
@@ -244,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (lengthET>0)
             editText.setSelection(index + 1);
-        else
-            editText.setSelection(1);
+        else editText.setSelection(1);
     }
 }
