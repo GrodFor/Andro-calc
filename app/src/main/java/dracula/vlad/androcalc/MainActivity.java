@@ -1,21 +1,24 @@
 package dracula.vlad.androcalc;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -28,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private String input = "";
     private ArrayList<Button> buttonArrayList= new ArrayList<>();
     private double result;
+    TextView tv_Res=null;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -35,27 +39,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getChildViews((ViewGroup) findViewById(R.id.ll_Buttons));
+        getChildViews(findViewById(R.id.ll_Buttons));
 
         final EditText editText = findViewById(R.id.et_Input);
         editText.requestFocus();
 
-        final TextView tv_Res = findViewById(R.id.tv_Result);
+        tv_Res = findViewById(R.id.tv_Result);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             editText.setShowSoftInputOnFocus(false);
         }
         else{
-            editText.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    v.onTouchEvent(event);
-                    InputMethodManager inputMethod = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (inputMethod != null) {
-                        inputMethod.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    }
-                    return true;
+            editText.setOnTouchListener((v, event) -> {
+                v.onTouchEvent(event);
+                InputMethodManager inputMethod = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (inputMethod != null) {
+                    inputMethod.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 }
+                return true;
             });
         }
 
@@ -112,108 +113,102 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        getChildViews((ViewGroup) findViewById(R.id.ll_nums));
+        tv_Res.setOnLongClickListener(v -> {
+            openDialog();
+            return true;
+        });
+
+        tv_Res.setOnClickListener(v -> Toast.makeText(this,"Удерживайте, чтобы скопировать", Toast.LENGTH_SHORT).show());
+
+        getChildViews(findViewById(R.id.ll_nums));
 
         for (final Button btn: buttonArrayList){
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String curBtnText = btn.getText().toString();
-                    addAtCursorPos(curBtnText);
-                }
+            btn.setOnClickListener(v -> {
+                String curBtnText = btn.getText().toString();
+                addAtCursorPos(curBtnText);
             });
         }
 
         Button btn_Clear = findViewById(R.id.btn_Clear);
-        btn_Clear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.getText().clear();
-                tv_Res.setText("");
-            }
+        btn_Clear.setOnClickListener(v -> {
+            editText.getText().clear();
+            tv_Res.setText("");
         });
 
         Button btn_Del = findViewById(R.id.btn_Del);
-        btn_Del.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int length = editText.getText().length();
-                if (length > 0) {
-                    delAtCursorPos();
-                }
+        btn_Del.setOnClickListener(v -> {
+            int length = editText.getText().length();
+            if (length > 0) {
+                delAtCursorPos();
             }
+            if (editText.getText().length()==0)
+                tv_Res.setText("");
         });
 
         Button btn_Dot = findViewById(R.id.btn_Dot);
-        btn_Dot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int length = editText.getText().length();
-                if (length>0){
-                    int index = editText.getSelectionStart();
-                    if (index!=0){
-                        String lastChar = editText.getText().toString();
-                        lastChar=String.valueOf(lastChar.charAt(index-1));
-                        Log.d(TAG, "lastChar: "+lastChar);
-                        if (!(lastChar.equals(".")))
-                            addAtCursorPos(".");
-                    }
+        btn_Dot.setOnClickListener(v -> {
+            int length = editText.getText().length();
+            if (length>0){
+                int index = editText.getSelectionStart();
+                if (index!=0){
+                    String lastChar = editText.getText().toString();
+                    lastChar=String.valueOf(lastChar.charAt(index-1));
+                    Log.d(TAG, "lastChar: "+lastChar);
+                    if (!(lastChar.equals(".")))
+                        addAtCursorPos(".");
                 }
             }
         });
 
         buttonArrayList.clear();
-        getChildViews((ViewGroup) findViewById(R.id.ll_funcs));
+        getChildViews(findViewById(R.id.ll_funcs));
 
         for (final Button btn: buttonArrayList){
 
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            btn.setOnClickListener(v -> {
 
-                    int lengthET = editText.getText().length();
-                    String curBtn=btn.getText().toString();
+                int lengthET = editText.getText().length();
+                String curBtn=btn.getText().toString();
 
 
-                    if (!btn.getText().toString().equals("=") && lengthET!=0) {
+                if (!btn.getText().toString().equals("=") && lengthET!=0) {
 
-                        String lastChar = editText.getText().toString();
-                        int index = editText.getSelectionStart();
-                        if(index!=0)
-                            lastChar=String.valueOf(lastChar.charAt(index-1));
-                        else lastChar=" ";
+                    String lastChar = editText.getText().toString();
+                    int index = editText.getSelectionStart();
+                    if(index!=0)
+                        lastChar=String.valueOf(lastChar.charAt(index-1));
+                    else lastChar=" ";
 
-                        //Log.d(TAG, "lastChar: "+lastChar);
-                        if (!(lastChar.equals(curBtn))){
-                            if (lastChar.equals("/") && curBtn.equals("*")) {
-                                delAtCursorPos();
-                                addAtCursorPos(curBtn);
-                            }
-                            else if (lastChar.equals("*") && curBtn.equals("/")) {
-                                delAtCursorPos();
-                                addAtCursorPos(curBtn);
-                            }
-                            else if (lastChar.equals("+") && curBtn.equals("-")) {
-                                delAtCursorPos();
-                                addAtCursorPos(curBtn);
-                            }
-                            else if (lastChar.equals("-") && curBtn.equals("+")) {
-                                delAtCursorPos();
-                                addAtCursorPos(curBtn);
-                            }
-                            else {
-                                addAtCursorPos(curBtn);
-                            }
+                    //Log.d(TAG, "lastChar: "+lastChar);
+                    if (!(lastChar.equals(curBtn))){
+                        if (lastChar.equals("/") && curBtn.equals("*")) {
+                            delAtCursorPos();
+                            addAtCursorPos(curBtn);
+                        }
+                        else if (lastChar.equals("*") && curBtn.equals("/")) {
+                            delAtCursorPos();
+                            addAtCursorPos(curBtn);
+                        }
+                        else if (lastChar.equals("+") && curBtn.equals("-")) {
+                            delAtCursorPos();
+                            addAtCursorPos(curBtn);
+                        }
+                        else if (lastChar.equals("-") && curBtn.equals("+")) {
+                            delAtCursorPos();
+                            addAtCursorPos(curBtn);
+                        }
+                        else {
+                            addAtCursorPos(curBtn);
                         }
                     }
-                    else if (btn.getText().toString().equals("-")){
-                        addAtCursorPos(curBtn);
-                    }
-                    else if (btn.getText().toString().equals("=")) {
-                        editText.setText(tv_Res.getText());
-                        input="";
-                        editText.setSelection(editText.getText().length());
-                    }
+                }
+                else if (btn.getText().toString().equals("-")){
+                    addAtCursorPos(curBtn);
+                }
+                else if (btn.getText().toString().equals("=")) {
+                    editText.setText(tv_Res.getText());
+                    input="";
+                    editText.setSelection(editText.getText().length());
                 }
             });
         }
@@ -269,5 +264,22 @@ public class MainActivity extends AppCompatActivity {
         if (lengthET>0)
             editText.setSelection(index + 1);
         else editText.setSelection(1);
+    }
+
+    private void openDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Скопировать результат в буфер?")
+                .setCancelable(true)
+                .setPositiveButton("Да", (dialog, id) -> {
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("result", tv_Res.getText().toString());
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(this,"Скопировано", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Нет", (dialog, id) -> dialog.cancel())
+                ;
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }
