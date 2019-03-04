@@ -5,7 +5,7 @@
     android:id="@+id/ll_Root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:divider="@drawable/separatorh"
+    android:divider="@drawable/separator_horizontal"
     android:orientation="vertical"
     android:showDividers="middle"
     tools:ignore="NestedWeights"
@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:divider="@drawable/separatorh"
+            android:divider="@drawable/separator_horizontal"
             android:orientation="vertical"
             android:paddingLeft="8dp"
             android:paddingRight="8dp">
@@ -64,7 +64,7 @@
                 android:gravity="center"
                 android:singleLine="true"
                 android:textAlignment="textEnd"
-                android:textColor="@color/result_color"
+                android:textColor="@color/gray_result_text_color"
                 android:textSize="32sp"
                 app:autoSizeMaxTextSize="32dp"
                 app:autoSizeMinTextSize="24sp" />
@@ -78,7 +78,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:baselineAligned="false"
-        android:divider="@drawable/separatorv"
+        android:divider="@drawable/separator_vertical"
         android:orientation="horizontal"
         android:showDividers="middle">
 
@@ -87,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:divider="@drawable/separatorh"
+            android:divider="@drawable/separator_horizontal"
             android:orientation="vertical"
             android:showDividers="middle">
 
@@ -96,8 +96,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:background="@color/funcs_back"
-                android:divider="@drawable/separatorv"
+                android:background="@color/light_orange_funcs_color"
+                android:divider="@drawable/separator_vertical"
                 android:orientation="horizontal"
                 android:showDividers="middle">
 
@@ -149,8 +149,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@color/gray_back"
-                android:divider="@drawable/separatorh"
+                android:background="@color/gray_bg_color"
+                android:divider="@drawable/separator_horizontal"
                 android:orientation="vertical"
                 android:showDividers="middle">
 
@@ -159,7 +159,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:divider="@drawable/separatorv"
+                    android:divider="@drawable/separator_vertical"
                     android:orientation="horizontal"
                     android:showDividers="middle">
 
@@ -200,7 +200,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:divider="@drawable/separatorv"
+                    android:divider="@drawable/separator_vertical"
                     android:orientation="horizontal"
                     android:showDividers="middle">
 
@@ -241,7 +241,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:divider="@drawable/separatorv"
+                    android:divider="@drawable/separator_vertical"
                     android:orientation="horizontal"
                     android:showDividers="middle">
 
@@ -282,7 +282,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:divider="@drawable/separatorv"
+                    android:divider="@drawable/separator_vertical"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:showDividers="middle">
@@ -305,8 +305,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:background="@color/funcs_back"
-            android:divider="@drawable/separatorh"
+            android:background="@color/light_orange_funcs_color"
+            android:divider="@drawable/separator_horizontal"
             android:orientation="vertical"
             android:showDividers="middle">
 

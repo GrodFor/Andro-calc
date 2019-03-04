@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#915000</color>
     <color name="colorAccent">#f57c00</color>
     <color name="transparent">#0000</color>
-    <color name="funcs_back">#FFAB40</color>
-    <color name="result_color">#7C7C7C</color>
-    <color name="gray_back">#BDBDBD</color>
+    <color name="light_orange_funcs_color">#FFAB40</color>
+    <color name="gray_result_text_color">#7C7C7C</color>
+    <color name="gray_bg_color">#BDBDBD</color>
 </resources>
