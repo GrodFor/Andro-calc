@@ -10,7 +10,6 @@ class ShuntingYard {
     private static final String TAG = ShuntingYard.class.getName();
 
     static String infixToPostfix(String infix) {
-
         infix = infix.replaceAll("[^*+\\-\\d./\\s]", "");
         String operators = "-+/*";
         StringBuilder postfix = new StringBuilder();
@@ -59,7 +58,6 @@ class ShuntingYard {
     }
 
     static double evalRPN(String postfix) {
-
         LinkedList<Double> stack = new LinkedList<>();
         String token;
         String[] array = postfix.split("\\s");

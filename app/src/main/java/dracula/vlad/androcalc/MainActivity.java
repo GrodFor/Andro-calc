@@ -29,27 +29,26 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
 
-    private String userInput = "";
+    private String userInput;
     private ArrayList<Button> buttons = new ArrayList<>();
     private double userResult;
 
-    private TextView resultView = null;
+    private TextView resultView;
     private EditText inputView;
     private Button clearAllButton;
-    private Button deleteOneButton;
-    private Button dotButton;
+    private Button deleteSingleCharButton;
+    private Button dotInputButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getChildViews(findViewById(R.id.ll_Buttons));
+        getChildViews(findViewById(R.id.buttons_linear_layout));
 
-        inputView = findViewById(R.id.et_Input);
+        resultView = findViewById(R.id.result_text_view);
+        inputView = findViewById(R.id.user_input_edit_text);
         inputView.requestFocus();
-
-        resultView = findViewById(R.id.tv_Result);
 
         hideSoftwareKeyboard();
 
@@ -83,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (NoSuchElementException e) {
                     userResult = 0;
                     Log.d(TAG, "onTextChanged: getting wrong input" + e);
-                    Toast.makeText(MainActivity.this, "Please check input values.", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -104,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         resultView.setOnClickListener(v -> Toast.makeText(this, "Удерживайте, чтобы скопировать", Toast.LENGTH_SHORT).show());
 
-        getChildViews(findViewById(R.id.ll_nums));
+        getChildViews(findViewById(R.id.numbers_linear_layout));
 
         for (final Button button : buttons) {
             button.setOnClickListener(v -> {
@@ -113,14 +111,14 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        clearAllButton = findViewById(R.id.btn_Clear);
+        clearAllButton = findViewById(R.id.clear_all_button);
         clearAllButton.setOnClickListener(v -> {
             inputView.getText().clear();
             resultView.setText("");
         });
 
-        deleteOneButton = findViewById(R.id.btn_Del);
-        deleteOneButton.setOnClickListener(v -> {
+        deleteSingleCharButton = findViewById(R.id.delete_button);
+        deleteSingleCharButton.setOnClickListener(v -> {
             int length = inputView.getText().length();
 
             if (length > 0) {
@@ -132,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        dotButton = findViewById(R.id.btn_Dot);
-        dotButton.setOnClickListener(v -> {
+        dotInputButton = findViewById(R.id.dot_input_button);
+        dotInputButton.setOnClickListener(v -> {
             int length = inputView.getText().length();
 
             if (length > 0) {
@@ -152,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         buttons.clear();
-        getChildViews(findViewById(R.id.ll_funcs));
+        getChildViews(findViewById(R.id.funcs_linear_layout));
 
         for (final Button button : buttons) {
             button.setOnClickListener(v -> {
@@ -208,9 +206,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void replaceOperator(String curBtn) {
+    private void replaceOperator(String currentInputButton) {
         delAtCursorPos();
-        addAtCursorPos(curBtn);
+        addAtCursorPos(currentInputButton);
     }
 
     public void getChildViews(ViewGroup viewGroup) {
@@ -243,21 +241,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void addAtCursorPos(String curBtnText) {
-        int lengthET = inputView.getText().length();
+    private void addAtCursorPos(String currentButtonText) {
+        int inputLength = inputView.getText().length();
         int index = inputView.getSelectionStart();
         Log.d(TAG, "index: " + index);
 
-        String full = inputView.getText().toString();
+        String fullString = inputView.getText().toString();
+        Log.d(TAG, "full string: " + fullString);
 
-        String first = full.substring(0, index);
-        Log.d(TAG, "first: " + first);
+        String beforeCursorText = fullString.substring(0, index);
+        Log.d(TAG, "first: " + beforeCursorText);
 
-        String second = full.substring(index, lengthET);
-        Log.d(TAG, "second: " + second);
+        String afterCursorText = fullString.substring(index, inputLength);
+        Log.d(TAG, "second: " + afterCursorText);
 
-        inputView.setText(String.format("%s%s%s", first, curBtnText, second));
-        inputView.setSelection(lengthET > 0 ? index + 1 : 1);
+        inputView.setText(String.format("%s%s%s", beforeCursorText, currentButtonText, afterCursorText));
+        inputView.setSelection(inputLength > 0 ? index + 1 : 1);
     }
 
     private void openDialog() {
