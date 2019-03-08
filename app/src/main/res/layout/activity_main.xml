@@ -306,7 +306,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-light"
-                android:text="/"
+                android:text="@string/divideButtonText"
                 android:textColor="@android:color/black"
                 android:textSize="36sp" />
 
@@ -317,7 +317,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-light"
-                android:text="*"
+                android:text="@string/multiplicationButtonText"
                 android:textColor="@android:color/black"
                 android:textSize="36sp" />
 
@@ -328,7 +328,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-light"
-                android:text="+"
+                android:text="@string/additionButtonText"
                 android:textColor="@android:color/black"
                 android:textSize="36sp" />
 
@@ -339,7 +339,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-light"
-                android:text="-"
+                android:text="@string/subtractionButtonText"
                 android:textColor="@android:color/black"
                 android:textSize="36sp" />
 
@@ -350,7 +350,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-light"
-                android:text="="
+                android:text="@string/equalButtonText"
                 android:textColor="@android:color/black"
                 android:textSize="36sp" />
         </LinearLayout>

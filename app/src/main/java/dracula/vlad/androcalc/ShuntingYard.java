@@ -8,6 +8,8 @@ import java.util.Stack;
 class ShuntingYard {
 
     private static final String TAG = ShuntingYard.class.getName();
+    private static final double ERROR_VALUE = -0.0;
+    private static final int TWO = 2;
 
     static String infixToPostfix(String infix) {
         infix = infix.replaceAll("[^*+\\-\\d./\\s]", "");
@@ -34,8 +36,8 @@ class ShuntingYard {
                 } else {
 
                     while (!priorities.isEmpty()) {
-                        int previousSecond = priorities.peek() / 2;
-                        int previousFirst = index / 2;
+                        int previousSecond = priorities.peek() / TWO;
+                        int previousFirst = index / TWO;
 
                         if (previousSecond > previousFirst || previousSecond == previousFirst) {
                             postfix.append(operators.charAt(priorities.pop())).append(' ');
@@ -69,11 +71,11 @@ class ShuntingYard {
             try {
                 tokenNum = Double.parseDouble(token);
             } catch (NumberFormatException e) {
-                tokenNum = -0.0;
+                tokenNum = ERROR_VALUE;
                 Log.d(TAG, "evalRPN: getting wrong number" + e);
             }
 
-            if (tokenNum != -0.0) {
+            if (tokenNum != ERROR_VALUE) {
                 stack.push(Double.parseDouble(token + ""));
             } else if (token.equals("*")) {
                 double secondOperand = stack.pop();
@@ -92,7 +94,7 @@ class ShuntingYard {
                 double firstOperand = stack.pop();
                 stack.push(firstOperand + secondOperand);
             } else {
-                return -0.0;
+                return ERROR_VALUE;
             }
         }
 

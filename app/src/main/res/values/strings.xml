@@ -13,4 +13,9 @@
     <string name="two">2</string>
     <string name="three">3</string>
     <string name="zero">0</string>
+    <string name="divideButtonText">/</string>
+    <string name="multiplicationButtonText">*</string>
+    <string name="additionButtonText">+</string>
+    <string name="subtractionButtonText">-</string>
+    <string name="equalButtonText">=</string>
 </resources>

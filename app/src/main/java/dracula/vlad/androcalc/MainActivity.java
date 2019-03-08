@@ -28,6 +28,12 @@ import static dracula.vlad.androcalc.ShuntingYard.*;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
+    private static final String DIVISION = "/";
+    private static final String MULTIPLICATION = "*";
+    private static final String ADDITION = "+";
+    private static final String SUBTRACTION = "-";
+    private static final String EQUATION = "=";
+    public static final String DOT = ".";
 
     private String userInput;
     private ArrayList<Button> buttons = new ArrayList<>();
@@ -142,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = String.valueOf(lastChar.charAt(index - 1));
                     Log.d(TAG, "lastChar: " + lastChar);
 
-                    if (!(lastChar.equals("."))) {
-                        addAtCursorPos(".");
+                    if (!(lastChar.equals(DOT))) {
+                        addAtCursorPos(DOT);
                     }
                 }
             }
@@ -157,28 +163,28 @@ public class MainActivity extends AppCompatActivity {
                 int lengthET = inputView.getText().length();
                 String curBtn = button.getText().toString();
 
-                if (!button.getText().toString().equals("=") && lengthET != 0) {
+                if (!button.getText().toString().equals(EQUATION) && lengthET != 0) {
                     String lastChar = inputView.getText().toString();
                     int index = inputView.getSelectionStart();
                     lastChar = index != 0 ? String.valueOf(lastChar.charAt(index - 1)) : " ";
 
                     if (!(lastChar.equals(curBtn))) {
 
-                        if (lastChar.equals("/") && curBtn.equals("*")) {
+                        if (lastChar.equals(DIVISION) && curBtn.equals(MULTIPLICATION)) {
                             replaceOperator(curBtn);
-                        } else if (lastChar.equals("*") && curBtn.equals("/")) {
+                        } else if (lastChar.equals(MULTIPLICATION) && curBtn.equals(DIVISION)) {
                             replaceOperator(curBtn);
-                        } else if (lastChar.equals("+") && curBtn.equals("-")) {
+                        } else if (lastChar.equals(ADDITION) && curBtn.equals(SUBTRACTION)) {
                             replaceOperator(curBtn);
-                        } else if (lastChar.equals("-") && curBtn.equals("+")) {
+                        } else if (lastChar.equals(SUBTRACTION) && curBtn.equals(ADDITION)) {
                             replaceOperator(curBtn);
                         } else {
                             addAtCursorPos(curBtn);
                         }
                     }
-                } else if (button.getText().toString().equals("-")) {
+                } else if (button.getText().toString().equals(SUBTRACTION)) {
                     addAtCursorPos(curBtn);
-                } else if (button.getText().toString().equals("=")) {
+                } else if (button.getText().toString().equals(EQUATION)) {
                     inputView.setText(resultView.getText());
                     userInput = "";
                     inputView.setSelection(inputView.getText().length());
