@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -34,23 +33,40 @@ public class MainActivity extends AppCompatActivity {
     private static final String SUBTRACTION = "-";
     private static final String EQUATION = "=";
     public static final String DOT = ".";
+    public static final String ERROR_RESULT = "-0.0";
 
     private String userInput;
-    private ArrayList<Button> buttons = new ArrayList<>();
     private double userResult;
 
     private TextView resultView;
     private EditText inputView;
+
     private Button clearAllButton;
     private Button deleteSingleCharButton;
     private Button dotInputButton;
 
+    private Button additionButton;
+    private Button subtractionButton;
+    private Button divisionButton;
+    private Button multiplicationButton;
+    private Button equationButton;
+
+    private Button oneButton;
+    private Button twoButton;
+    private Button threeButton;
+    private Button fourButton;
+    private Button fiveButton;
+    private Button sixButton;
+    private Button sevenButton;
+    private Button eightButton;
+    private Button nineButton;
+    private Button zeroButton;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        getChildViews(findViewById(R.id.buttons_linear_layout));
+        setContentView(R.layout.activity_main);
 
         resultView = findViewById(R.id.result_text_view);
         inputView = findViewById(R.id.user_input_edit_text);
@@ -58,8 +74,33 @@ public class MainActivity extends AppCompatActivity {
 
         hideSoftwareKeyboard();
 
-        inputView.addTextChangedListener(new TextWatcher() {
+        oneButton = findViewById(R.id.one_button);
+        twoButton = findViewById(R.id.two_button);
+        threeButton = findViewById(R.id.three_button);
+        fourButton = findViewById(R.id.four_button);
+        fiveButton = findViewById(R.id.five_button);
+        sixButton = findViewById(R.id.six_button);
+        sevenButton = findViewById(R.id.seven_button);
+        eightButton = findViewById(R.id.eight_button);
+        nineButton = findViewById(R.id.nine_button);
+        zeroButton = findViewById(R.id.zero_button);
 
+        additionButton = findViewById(R.id.add_button);
+        subtractionButton = findViewById(R.id.substact_button);
+        divisionButton = findViewById(R.id.division_button);
+        multiplicationButton = findViewById(R.id.multiply_button);
+        equationButton = findViewById(R.id.equal_button);
+
+        final Button[] numbersButtons =
+                {oneButton, twoButton, threeButton, fourButton, fiveButton, sixButton,
+                        sevenButton, eightButton, nineButton, zeroButton};
+
+        final Button[] funcsButtons =
+                {additionButton, subtractionButton, divisionButton, multiplicationButton, equationButton};
+
+        final TextWatcher inputTextWatcher = new TextWatcher() {
+
+            @Override
             public void onTextChanged(CharSequence c, int start, int before, int count) {
                 userInput = c.toString();
                 Log.d(TAG, "1 onTextChanged input: " + userInput);
@@ -80,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                     userResult = evalRPN(infixToPostfix(userInput));
                     Log.d(TAG, "result: " + userResult);
 
-                    if (!String.valueOf(userResult).equals("-0.0")) {
+                    if (!String.valueOf(userResult).equals(ERROR_RESULT)) {
                         int intResult = (int) userResult;
                         resultView.setText(intResult == userResult ? String.valueOf(intResult) : String.valueOf(userResult));
                     }
@@ -91,14 +132,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            @Override
             public void beforeTextChanged(CharSequence c, int start, int count, int after) {
                 // this space intentionally left blank
             }
 
+            @Override
             public void afterTextChanged(Editable c) {
                 // this one too
             }
-        });
+        };
+
+        inputView.addTextChangedListener(inputTextWatcher);
 
         resultView.setOnLongClickListener(v -> {
             openDialog();
@@ -108,9 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
         resultView.setOnClickListener(v -> Toast.makeText(this, "Удерживайте, чтобы скопировать", Toast.LENGTH_SHORT).show());
 
-        getChildViews(findViewById(R.id.numbers_linear_layout));
-
-        for (final Button button : buttons) {
+        for (final Button button : numbersButtons) {
             button.setOnClickListener(v -> {
                 String currentButtonText = button.getText().toString();
                 addAtCursorPos(currentButtonText);
@@ -129,22 +172,24 @@ public class MainActivity extends AppCompatActivity {
 
             if (length > 0) {
                 delAtCursorPos();
+                length = inputView.getText().length();
             }
 
-            if (inputView.getText().length() == 0) {
+            if (length == 0) {
                 resultView.setText("");
             }
         });
 
         dotInputButton = findViewById(R.id.dot_input_button);
-        dotInputButton.setOnClickListener(v -> {
-            int length = inputView.getText().length();
 
-            if (length > 0) {
+        final View.OnClickListener dotButtonClickListener = v -> {
+            final String inputText = inputView.getText().toString();
+
+            if (inputText.length() > 0) {
                 int index = inputView.getSelectionStart();
 
                 if (index != 0) {
-                    String lastChar = inputView.getText().toString();
+                    String lastChar = inputText;
                     lastChar = String.valueOf(lastChar.charAt(index - 1));
                     Log.d(TAG, "lastChar: " + lastChar);
 
@@ -153,38 +198,34 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        });
+        };
 
-        buttons.clear();
-        getChildViews(findViewById(R.id.funcs_linear_layout));
+        dotInputButton.setOnClickListener(dotButtonClickListener);
 
-        for (final Button button : buttons) {
+        for (final Button button : funcsButtons) {
             button.setOnClickListener(v -> {
                 int lengthET = inputView.getText().length();
-                String curBtn = button.getText().toString();
+                final String curBtn = button.getText().toString();
 
-                if (!button.getText().toString().equals(EQUATION) && lengthET != 0) {
+                if (!curBtn.equals(EQUATION) && lengthET != 0) {
                     String lastChar = inputView.getText().toString();
                     int index = inputView.getSelectionStart();
                     lastChar = index != 0 ? String.valueOf(lastChar.charAt(index - 1)) : " ";
 
-                    if (!(lastChar.equals(curBtn))) {
-
-                        if (lastChar.equals(DIVISION) && curBtn.equals(MULTIPLICATION)) {
-                            replaceOperator(curBtn);
-                        } else if (lastChar.equals(MULTIPLICATION) && curBtn.equals(DIVISION)) {
-                            replaceOperator(curBtn);
-                        } else if (lastChar.equals(ADDITION) && curBtn.equals(SUBTRACTION)) {
-                            replaceOperator(curBtn);
-                        } else if (lastChar.equals(SUBTRACTION) && curBtn.equals(ADDITION)) {
-                            replaceOperator(curBtn);
-                        } else {
-                            addAtCursorPos(curBtn);
-                        }
+                    if (lastChar.equals(DIVISION) && curBtn.equals(MULTIPLICATION)) {
+                        swapSamePriorityOperators(curBtn);
+                    } else if (lastChar.equals(MULTIPLICATION) && curBtn.equals(DIVISION)) {
+                        swapSamePriorityOperators(curBtn);
+                    } else if (lastChar.equals(ADDITION) && curBtn.equals(SUBTRACTION)) {
+                        swapSamePriorityOperators(curBtn);
+                    } else if (lastChar.equals(SUBTRACTION) && curBtn.equals(ADDITION)) {
+                        swapSamePriorityOperators(curBtn);
+                    } else {
+                        addAtCursorPos(curBtn);
                     }
-                } else if (button.getText().toString().equals(SUBTRACTION)) {
+                } else if (curBtn.equals(SUBTRACTION)) {
                     addAtCursorPos(curBtn);
-                } else if (button.getText().toString().equals(EQUATION)) {
+                } else if (curBtn.equals(EQUATION)) {
                     inputView.setText(resultView.getText());
                     userInput = "";
                     inputView.setSelection(inputView.getText().length());
@@ -212,31 +253,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void replaceOperator(String currentInputButton) {
+    private void swapSamePriorityOperators(String newOperator) {
         delAtCursorPos();
-        addAtCursorPos(currentInputButton);
-    }
-
-    public void getChildViews(ViewGroup viewGroup) {
-
-        if (viewGroup != null) {
-            int children = viewGroup.getChildCount();
-            for (int i = 0; i < children; i++) {
-                View view = viewGroup.getChildAt(i);
-
-                if (view instanceof ViewGroup) {
-                    getChildViews((ViewGroup) view);
-                }
-
-                if (view instanceof Button) {
-                    TypedValue outValue = new TypedValue();
-                    view.getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,
-                            outValue, true);
-                    view.setBackgroundResource(outValue.resourceId);
-                    buttons.add((Button) view);
-                }
-            }
-        }
+        addAtCursorPos(newOperator);
     }
 
     private void delAtCursorPos() {
@@ -269,13 +288,13 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Скопировать результат в буфер?")
                 .setCancelable(true)
-                .setPositiveButton("Да", (dialog, id) -> {
+                .setPositiveButton(getString(android.R.string.yes), (dialog, id) -> {
                     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText("result", resultView.getText().toString());
                     clipboard.setPrimaryClip(clip);
                     Toast.makeText(this, "Скопировано", Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Нет", (dialog, id) -> dialog.cancel())
+                .setNegativeButton(getString(android.R.string.no), (dialog, id) -> dialog.cancel())
         ;
 
         AlertDialog alert = builder.create();

@@ -8,14 +8,17 @@ import java.util.Stack;
 class ShuntingYard {
 
     private static final String TAG = ShuntingYard.class.getName();
+    private static final String OPERATORS = "-+/*";
     private static final double ERROR_VALUE = -0.0;
     private static final int TWO = 2;
 
+    private static Stack<Integer> priorities;
+    private static StringBuilder postfix;
+
     static String infixToPostfix(String infix) {
         infix = infix.replaceAll("[^*+\\-\\d./\\s]", "");
-        String operators = "-+/*";
-        StringBuilder postfix = new StringBuilder();
-        Stack<Integer> priorities = new Stack<>();
+        postfix = new StringBuilder();
+        priorities = new Stack<>();
 
         String token;
         String[] tokens = infix.split("\\s");
@@ -27,24 +30,14 @@ class ShuntingYard {
                 continue;
             }
 
-            int index = operators.indexOf(token);
+            int index = OPERATORS.indexOf(token);
 
             if (index != -1) {
 
                 if (priorities.isEmpty()) {
                     priorities.push(index);
                 } else {
-
-                    while (!priorities.isEmpty()) {
-                        int previousSecond = priorities.peek() / TWO;
-                        int previousFirst = index / TWO;
-
-                        if (previousSecond > previousFirst || previousSecond == previousFirst) {
-                            postfix.append(operators.charAt(priorities.pop())).append(' ');
-                        } else {
-                            break;
-                        }
-                    }
+                    pickHigherPriorityOperator(index);
                     priorities.push(index);
                 }
             } else {
@@ -53,10 +46,23 @@ class ShuntingYard {
         }
 
         while (!priorities.isEmpty()) {
-            postfix.append(operators.charAt(priorities.pop())).append(' ');
+            postfix.append(OPERATORS.charAt(priorities.pop())).append(' ');
         }
 
         return postfix.toString();
+    }
+
+    private static void pickHigherPriorityOperator(int index) {
+        while (!priorities.isEmpty()) {
+            int previousSecond = priorities.peek() / TWO;
+            int previousFirst = index / TWO;
+
+            if (previousSecond > previousFirst || previousSecond == previousFirst) {
+                postfix.append(OPERATORS.charAt(priorities.pop())).append(' ');
+            } else {
+                break;
+            }
+        }
     }
 
     static double evalRPN(String postfix) {
