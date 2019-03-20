@@ -12,14 +12,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import static dracula.vlad.androcalc.ShuntingYard.*;
@@ -33,7 +31,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String SUBTRACTION = "-";
     private static final String EQUATION = "=";
     public static final String DOT = ".";
-    public static final String ERROR_RESULT = "-0.0";
+    public static final double ERROR_RESULT = -0.0;
+    public static final String SPLIT_WITH_WHITESPACES = "([+\\-/*])(\\d)";
+    public static final String ADD_WHITESPACE_BEFORE_FIRST_NEGATION = "(^-)(\\s)";
+    public static final String REMOVE_WHITESPACE_BETWEEN_NEGATION_AND_NUMBER = "(\\D\\s\\D)(\\s)";
+    public static final String ADD_WHITESPACES_AFTER_NUMBERS_BEFORE_NEGATION = "(\\d)([-+/*])";
+    public static final String ON_TEXT_CHANGED_INPUT = "onTextChanged input: ";
+    public static final String ON_TEXT_CHANGED_RESULT = "onTextChanged result: ";
+    public static final String ON_TEXT_CHANGED_GETTING_WRONG_INPUT = "onTextChanged: getting wrong input";
 
     private String userInput;
     private double userResult;
@@ -61,147 +66,33 @@ public class MainActivity extends AppCompatActivity {
     private Button eightButton;
     private Button nineButton;
     private Button zeroButton;
-    
+    private Button[] numbersButtons;
+    private Button[] funcsButtons;
+
+    private MyTextWatcher myTextWatcher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        resultView = findViewById(R.id.result_text_view);
-        inputView = findViewById(R.id.user_input_edit_text);
-        inputView.requestFocus();
-
         hideSoftwareKeyboard();
 
-        oneButton = findViewById(R.id.one_button);
-        twoButton = findViewById(R.id.two_button);
-        threeButton = findViewById(R.id.three_button);
-        fourButton = findViewById(R.id.four_button);
-        fiveButton = findViewById(R.id.five_button);
-        sixButton = findViewById(R.id.six_button);
-        sevenButton = findViewById(R.id.seven_button);
-        eightButton = findViewById(R.id.eight_button);
-        nineButton = findViewById(R.id.nine_button);
-        zeroButton = findViewById(R.id.zero_button);
+        initNumsButtons();
 
-        additionButton = findViewById(R.id.add_button);
-        subtractionButton = findViewById(R.id.substact_button);
-        divisionButton = findViewById(R.id.division_button);
-        multiplicationButton = findViewById(R.id.multiply_button);
-        equationButton = findViewById(R.id.equal_button);
+        initResultAndInputViews();
 
-        final Button[] numbersButtons =
-                {oneButton, twoButton, threeButton, fourButton, fiveButton, sixButton,
-                        sevenButton, eightButton, nineButton, zeroButton};
+        initNumsClickListener();
 
-        final Button[] funcsButtons =
-                {additionButton, subtractionButton, divisionButton, multiplicationButton, equationButton};
+        initClearAndDelButtons();
 
-        final TextWatcher inputTextWatcher = new TextWatcher() {
+        initDotButton();
 
-            @Override
-            public void onTextChanged(CharSequence c, int start, int before, int count) {
-                userInput = c.toString();
-                Log.d(TAG, "1 onTextChanged input: " + userInput);
+        initFuncsButtonsClickListeners();
+    }
 
-                userInput = userInput.replaceAll("([+\\-/*])(\\d)", " $1 $2");
-                Log.d(TAG, "2 onTextChanged input: " + userInput);
-
-                userInput = userInput.trim().replaceAll("(^-)(\\s)", "$1");
-                Log.d(TAG, "3 onTextChanged input: " + userInput);
-
-                userInput = userInput.replaceAll("(\\D\\s\\D)(\\s)", "$1");
-                Log.d(TAG, "5 onTextChanged input: " + userInput);
-
-                userInput = userInput.replaceAll("(\\d)([-+/*])", "$1 $2");
-                Log.d(TAG, "6 onTextChanged input: " + userInput);
-
-                try {
-                    userResult = evalRPN(infixToPostfix(userInput));
-                    Log.d(TAG, "result: " + userResult);
-
-                    if (!String.valueOf(userResult).equals(ERROR_RESULT)) {
-                        int intResult = (int) userResult;
-                        resultView.setText(intResult == userResult ? String.valueOf(intResult) : String.valueOf(userResult));
-                    }
-
-                } catch (NoSuchElementException e) {
-                    userResult = 0;
-                    Log.d(TAG, "onTextChanged: getting wrong input" + e);
-                }
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence c, int start, int count, int after) {
-                // this space intentionally left blank
-            }
-
-            @Override
-            public void afterTextChanged(Editable c) {
-                // this one too
-            }
-        };
-
-        inputView.addTextChangedListener(inputTextWatcher);
-
-        resultView.setOnLongClickListener(v -> {
-            openDialog();
-
-            return true;
-        });
-
-        resultView.setOnClickListener(v -> Toast.makeText(this, "Удерживайте, чтобы скопировать", Toast.LENGTH_SHORT).show());
-
-        for (final Button button : numbersButtons) {
-            button.setOnClickListener(v -> {
-                String currentButtonText = button.getText().toString();
-                addAtCursorPos(currentButtonText);
-            });
-        }
-
-        clearAllButton = findViewById(R.id.clear_all_button);
-        clearAllButton.setOnClickListener(v -> {
-            inputView.getText().clear();
-            resultView.setText("");
-        });
-
-        deleteSingleCharButton = findViewById(R.id.delete_button);
-        deleteSingleCharButton.setOnClickListener(v -> {
-            int length = inputView.getText().length();
-
-            if (length > 0) {
-                delAtCursorPos();
-                length = inputView.getText().length();
-            }
-
-            if (length == 0) {
-                resultView.setText("");
-            }
-        });
-
-        dotInputButton = findViewById(R.id.dot_input_button);
-
-        final View.OnClickListener dotButtonClickListener = v -> {
-            final String inputText = inputView.getText().toString();
-
-            if (inputText.length() > 0) {
-                int index = inputView.getSelectionStart();
-
-                if (index != 0) {
-                    String lastChar = inputText;
-                    lastChar = String.valueOf(lastChar.charAt(index - 1));
-                    Log.d(TAG, "lastChar: " + lastChar);
-
-                    if (!(lastChar.equals(DOT))) {
-                        addAtCursorPos(DOT);
-                    }
-                }
-            }
-        };
-
-        dotInputButton.setOnClickListener(dotButtonClickListener);
-
+    private void initFuncsButtonsClickListeners() {
         for (final Button button : funcsButtons) {
             button.setOnClickListener(v -> {
                 int lengthET = inputView.getText().length();
@@ -232,11 +123,105 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
 
+    private void initDotButton() {
+        dotInputButton = findViewById(R.id.dot_input_button);
+
+        final View.OnClickListener dotButtonClickListener = v -> {
+            final String inputText = inputView.getText().toString();
+
+            if (inputText.length() > 0) {
+                int index = inputView.getSelectionStart();
+
+                if (index != 0) {
+                    String lastChar = inputText;
+                    lastChar = String.valueOf(lastChar.charAt(index - 1));
+
+                    if (!(lastChar.equals(DOT))) {
+                        addAtCursorPos(DOT);
+                    }
+                }
+            }
+        };
+
+        dotInputButton.setOnClickListener(dotButtonClickListener);
+    }
+
+    private void initClearAndDelButtons() {
+        clearAllButton = findViewById(R.id.clear_all_button);
+        clearAllButton.setOnClickListener(v -> {
+            inputView.getText().clear();
+            resultView.setText("");
+        });
+
+        deleteSingleCharButton = findViewById(R.id.delete_button);
+        deleteSingleCharButton.setOnClickListener(v -> {
+            int length = inputView.getText().length();
+
+            if (length > 0) {
+                delAtCursorPos();
+                length = inputView.getText().length();
+            }
+
+            if (length == 0) {
+                resultView.setText("");
+            }
+        });
+    }
+
+    private void initNumsClickListener() {
+        for (final Button button : numbersButtons) {
+            button.setOnClickListener(v -> {
+                String currentButtonText = button.getText().toString();
+                addAtCursorPos(currentButtonText);
+            });
+        }
+    }
+
+    private void initNumsButtons() {
+        oneButton = findViewById(R.id.one_button);
+        twoButton = findViewById(R.id.two_button);
+        threeButton = findViewById(R.id.three_button);
+        fourButton = findViewById(R.id.four_button);
+        fiveButton = findViewById(R.id.five_button);
+        sixButton = findViewById(R.id.six_button);
+        sevenButton = findViewById(R.id.seven_button);
+        eightButton = findViewById(R.id.eight_button);
+        nineButton = findViewById(R.id.nine_button);
+        zeroButton = findViewById(R.id.zero_button);
+
+        additionButton = findViewById(R.id.add_button);
+        subtractionButton = findViewById(R.id.substact_button);
+        divisionButton = findViewById(R.id.division_button);
+        multiplicationButton = findViewById(R.id.multiply_button);
+        equationButton = findViewById(R.id.equal_button);
+
+        numbersButtons = new Button[]{oneButton, twoButton, threeButton, fourButton, fiveButton, sixButton,
+                sevenButton, eightButton, nineButton, zeroButton};
+
+        funcsButtons = new Button[]{additionButton, subtractionButton, divisionButton, multiplicationButton, equationButton};
+    }
+
+    private void initResultAndInputViews() {
+        resultView = findViewById(R.id.result_text_view);
+        resultView.setOnLongClickListener(v -> {
+            openDialog();
+
+            return true;
+        });
+
+        resultView.setOnClickListener(v -> Toast.makeText(this, getString(R.string.hold_to_copy), Toast.LENGTH_SHORT).show());
+
+        myTextWatcher = new MyTextWatcher();
+        inputView.addTextChangedListener(myTextWatcher);
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private void hideSoftwareKeyboard() {
+        inputView = findViewById(R.id.user_input_edit_text);
+        inputView.requestFocus();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             inputView.setShowSoftInputOnFocus(false);
         } else {
@@ -269,16 +254,10 @@ public class MainActivity extends AppCompatActivity {
     private void addAtCursorPos(String currentButtonText) {
         int inputLength = inputView.getText().length();
         int index = inputView.getSelectionStart();
-        Log.d(TAG, "index: " + index);
 
         String fullString = inputView.getText().toString();
-        Log.d(TAG, "full string: " + fullString);
-
         String beforeCursorText = fullString.substring(0, index);
-        Log.d(TAG, "first: " + beforeCursorText);
-
         String afterCursorText = fullString.substring(index, inputLength);
-        Log.d(TAG, "second: " + afterCursorText);
 
         inputView.setText(String.format("%s%s%s", beforeCursorText, currentButtonText, afterCursorText));
         inputView.setSelection(inputLength > 0 ? index + 1 : 1);
@@ -286,18 +265,63 @@ public class MainActivity extends AppCompatActivity {
 
     private void openDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Скопировать результат в буфер?")
+        builder.setMessage(R.string.add_to_byffer)
                 .setCancelable(true)
                 .setPositiveButton(getString(android.R.string.yes), (dialog, id) -> {
                     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText("result", resultView.getText().toString());
                     clipboard.setPrimaryClip(clip);
-                    Toast.makeText(this, "Скопировано", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.copied), Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton(getString(android.R.string.no), (dialog, id) -> dialog.cancel())
         ;
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        @Override
+        public void onTextChanged(CharSequence c, int start, int before, int count) {
+            userInput = c.toString();
+            Log.d(TAG, ON_TEXT_CHANGED_INPUT + userInput);
+
+            userInput = userInput.replaceAll(SPLIT_WITH_WHITESPACES, " $1 $2");
+            Log.d(TAG, ON_TEXT_CHANGED_INPUT + userInput);
+
+            userInput = userInput.trim().replaceAll(ADD_WHITESPACE_BEFORE_FIRST_NEGATION, "$1");
+            Log.d(TAG, ON_TEXT_CHANGED_INPUT + userInput);
+
+            userInput = userInput.replaceAll(REMOVE_WHITESPACE_BETWEEN_NEGATION_AND_NUMBER, "$1");
+            Log.d(TAG, ON_TEXT_CHANGED_INPUT + userInput);
+
+            userInput = userInput.replaceAll(ADD_WHITESPACES_AFTER_NUMBERS_BEFORE_NEGATION, "$1 $2");
+            Log.d(TAG, ON_TEXT_CHANGED_INPUT + userInput);
+
+            try {
+                userResult = evalRPN(infixToPostfix(userInput));
+                Log.d(TAG, ON_TEXT_CHANGED_RESULT + userResult);
+
+                if (!Double.valueOf(userResult).equals(ERROR_RESULT)) {
+                    int intResult = (int) userResult;
+                    resultView.setText(intResult == userResult ? String.valueOf(intResult) : String.valueOf(userResult));
+                }
+
+            } catch (NoSuchElementException e) {
+                userResult = 0;
+                Log.d(TAG, ON_TEXT_CHANGED_GETTING_WRONG_INPUT + e);
+            }
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence c, int start, int count, int after) {
+            // this space intentionally left blank
+        }
+
+        @Override
+        public void afterTextChanged(Editable c) {
+            // this one too
+        }
     }
 }

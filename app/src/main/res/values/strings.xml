@@ -18,4 +18,7 @@
     <string name="additionButtonText">+</string>
     <string name="subtractionButtonText">-</string>
     <string name="equalButtonText">=</string>
+    <string name="hold_to_copy">Удерживайте, чтобы скопировать</string>
+    <string name="add_to_byffer">Скопировать результат в буфер?</string>
+    <string name="copied">Скопировано</string>
 </resources>

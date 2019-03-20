@@ -10,18 +10,20 @@ class ShuntingYard {
     private static final String TAG = ShuntingYard.class.getName();
     private static final String OPERATORS = "-+/*";
     private static final double ERROR_VALUE = -0.0;
-    private static final int TWO = 2;
+    private static final int PRIORITY_HALF_DIVIDER = 2;
+    public static final String REMOVE_INVALID_SYMBOLS = "[^*+\\-\\d./\\s]";
+    public static final String WHITESPACE_SPLITTER = "\\s";
 
     private static Stack<Integer> priorities;
     private static StringBuilder postfix;
 
     static String infixToPostfix(String infix) {
-        infix = infix.replaceAll("[^*+\\-\\d./\\s]", "");
+        infix = infix.replaceAll(REMOVE_INVALID_SYMBOLS, "");
         postfix = new StringBuilder();
         priorities = new Stack<>();
 
         String token;
-        String[] tokens = infix.split("\\s");
+        String[] tokens = infix.split(WHITESPACE_SPLITTER);
 
         for (String singleToken : tokens) {
             token = singleToken;
@@ -54,8 +56,8 @@ class ShuntingYard {
 
     private static void pickHigherPriorityOperator(int index) {
         while (!priorities.isEmpty()) {
-            int previousSecond = priorities.peek() / TWO;
-            int previousFirst = index / TWO;
+            int previousSecond = priorities.peek() / PRIORITY_HALF_DIVIDER;
+            int previousFirst = index / PRIORITY_HALF_DIVIDER;
 
             if (previousSecond > previousFirst || previousSecond == previousFirst) {
                 postfix.append(OPERATORS.charAt(priorities.pop())).append(' ');
@@ -68,7 +70,7 @@ class ShuntingYard {
     static double evalRPN(String postfix) {
         LinkedList<Double> stack = new LinkedList<>();
         String token;
-        String[] array = postfix.split("\\s");
+        String[] array = postfix.split(WHITESPACE_SPLITTER);
 
         for (String anArray : array) {
             token = anArray;
